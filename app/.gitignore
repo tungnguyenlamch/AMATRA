@@ -1,0 +1,8 @@
+.devenv/
+.direnv/
+__pycache__/
+runs/
+sample/
+test_env/
+dist/
+src/amatra_app/models/

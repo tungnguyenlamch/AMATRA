@@ -1,0 +1,33 @@
+[build-system]
+requires      = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "amatra-app"
+version = "0.1.0"
+description = "AMATRA desktop app: manga bubble segmentation, OCR, translation, and typesetting"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+dependencies = [
+  "accelerate",
+  "manga-ocr",
+  "numpy",
+  "opencv-python",
+  "pyside6",
+  "sacremoses",
+  "sentencepiece",
+  "transformers==4.37.2",
+  "ultralytics",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/amatra_app"]
+
+[project.scripts]
+amatra = "amatra_app.main:main"
