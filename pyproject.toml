@@ -1,0 +1,77 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "amatra"
+version = "0.2.0"
+description = "AMATRA headless CLI, translation boundary, and desktop app packaging"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [
+  { name = "AMATRA contributors" },
+]
+dependencies = [
+  "numpy",
+  "pillow",
+]
+
+[project.optional-dependencies]
+app = [
+  "accelerate",
+  "huggingface-hub",
+  "manga-ocr",
+  "matplotlib",
+  "opencv-python",
+  "pyside6",
+  "sacremoses",
+  "sentencepiece",
+  "transformers==4.37.2",
+  "ultralytics",
+]
+dev = [
+  "pytest",
+]
+research = [
+  "accelerate",
+  "sentencepiece",
+  "torch",
+  "transformers==4.37.2",
+]
+eval = [
+  "pytest",
+]
+google = [
+  "google-cloud-translate",
+  "googletrans",
+  "nest-asyncio",
+]
+
+[project.scripts]
+amatra = "amatra.cli:main"
+amatra-gui = "amatra_app.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/amatra", "app/src/amatra_app"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/README.md",
+  "/AGENTS.md",
+  "/JOURNAL.md",
+  "/docs",
+  "/src/amatra",
+  "/app/src/amatra_app",
+  "/tests",
+]
+
+[tool.hatch.build]
+include = [
+  "src/amatra/config/*.json",
+  "src/amatra/fixtures/**/*",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "app/src"]

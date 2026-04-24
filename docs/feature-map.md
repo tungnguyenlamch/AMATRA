@@ -20,7 +20,21 @@ adapter, not editing UI code.
 | Adapters | [`src/amatra/translation/adapters/research_adapter.py`](../src/amatra/translation/adapters/research_adapter.py), [`elan_mt.py`](../src/amatra/translation/adapters/elan_mt.py), [`llm.py`](../src/amatra/translation/adapters/llm.py), [`google.py`](../src/amatra/translation/adapters/google.py) |
 | Docs   | [`docs/INTEGRATION.md`](INTEGRATION.md), "How the pieces fit together" in [`README.md`](../README.md) |
 | Config | none (registration is via `@register_translator` at import time) |
-| Tests  | — |
+| Config | [`src/amatra/config/translator_presets.v1.json`](../src/amatra/config/translator_presets.v1.json) |
+| Tests  | [`tests/test_translation_boundary.py`](../tests/test_translation_boundary.py) |
+
+## Headless CLI and mock fixture workflow
+
+Repo-root task surface and deterministic no-network validation path for
+agents and CI.
+
+| Kind   | Path |
+|--------|------|
+| Code   | [`src/amatra/cli.py`](../src/amatra/cli.py), [`src/amatra/runtime/headless.py`](../src/amatra/runtime/headless.py), [`config.py`](../src/amatra/runtime/config.py), [`mock.py`](../src/amatra/runtime/mock.py), [`runs.py`](../src/amatra/runtime/runs.py) |
+| Fixtures | [`src/amatra/fixtures/`](../src/amatra/fixtures) |
+| Config | [`pyproject.toml`](../pyproject.toml), [`Makefile`](../Makefile) |
+| Docs   | [`README.md`](../README.md), [`docs/agent-workflows.md`](agent-workflows.md) |
+| Tests  | [`tests/test_cli_and_fixtures.py`](../tests/test_cli_and_fixtures.py) |
 
 ## Research: translation models
 
@@ -77,10 +91,10 @@ segmentation/OCR/typesetter classes currently live inside the app package
 | Segmentation wrapper | [`app/src/amatra_app/BubbleSegmenter.py`](../app/src/amatra_app/BubbleSegmenter.py) |
 | OCR wrapper          | [`app/src/amatra_app/MangaOCRModel.py`](../app/src/amatra_app/MangaOCRModel.py) |
 | Typesetter           | [`app/src/amatra_app/MangaTypesetter.py`](../app/src/amatra_app/MangaTypesetter.py) |
-| Packaging   | [`app/pyproject.toml`](../app/pyproject.toml) |
+| Packaging   | [`app/pyproject.toml`](../app/pyproject.toml) (`amatra-gui`), [`pyproject.toml`](../pyproject.toml) (`amatra`) |
 | Licence     | [`app/LICENSE`](../app/LICENSE) (MIT; original Lucile attribution) |
 | Docs        | [`app/README.md`](../app/README.md), [`README.md`](../README.md) §Quickstart |
-| Tests       | — |
+| Tests       | [`tests/test_cli_and_fixtures.py`](../tests/test_cli_and_fixtures.py) (bootstrap smoke) |
 
 ## Data and environments
 
@@ -100,5 +114,6 @@ segmentation/OCR/typesetter classes currently live inside the app package
 | Cover page | [`README.md`](../README.md) |
 | Agent rules | [`AGENTS.md`](../AGENTS.md) |
 | Integration design | [`docs/INTEGRATION.md`](INTEGRATION.md) |
+| Agent workflows | [`docs/agent-workflows.md`](agent-workflows.md) |
 | Change log | [`JOURNAL.md`](../JOURNAL.md) |
 | Feature map | [`docs/feature-map.md`](feature-map.md) (this file) |

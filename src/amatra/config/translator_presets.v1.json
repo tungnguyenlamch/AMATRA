@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "presets": {
+    "default": {},
+    "literal": {
+      "do_sample": false,
+      "max_new_tokens": 80,
+      "temperature": 0.2
+    },
+    "manga-dialogue": {
+      "do_sample": false,
+      "max_new_tokens": 120,
+      "temperature": 0.4,
+      "system_prompt": "Translate Japanese manga dialogue into natural English. Preserve tone, names, and speech level. Output only the translation."
+    }
+  }
+}

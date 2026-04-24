@@ -1,0 +1,21 @@
+{
+  "bboxes": [
+    [1, 1, 7, 6],
+    [8, 4, 15, 10],
+    [2, 10, 10, 15]
+  ],
+  "bubble_count": 3,
+  "fixture": "multiple-bubbles",
+  "input_image": "src/amatra/fixtures/multiple-bubbles/page.pgm",
+  "ocr_texts": [
+    "右上",
+    "中央",
+    "下"
+  ],
+  "output_image": "output/fixtures/multiple-bubbles/rendered.png",
+  "translations": [
+    "Upper right",
+    "Middle",
+    "Bottom"
+  ]
+}

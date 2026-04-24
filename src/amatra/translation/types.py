@@ -50,11 +50,16 @@ class TranslatorConfig:
     def from_mapping(cls, cfg: Mapping[str, Any]) -> "TranslatorConfig":
         if "type" not in cfg:
             raise ValueError("TranslatorConfig requires a 'type' key")
+        model_type = cfg["type"]
+        variant = cfg.get("variant")
+        if isinstance(model_type, str) and ":" in model_type and variant is None:
+            model_type, variant = model_type.split(":", 1)
+            variant = variant or None
         known = {"type", "variant", "device", "verbose"}
         extra = {k: v for k, v in cfg.items() if k not in known}
         return cls(
-            type=cfg["type"],
-            variant=cfg.get("variant"),
+            type=model_type,
+            variant=variant,
             device=cfg.get("device", "auto"),
             verbose=cfg.get("verbose", False),
             extra=extra,

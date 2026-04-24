@@ -1,0 +1,24 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  fast-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v4
+      - name: Install dev dependencies
+        run: uv pip install --system -e ".[dev]"
+      - name: Import smoke
+        run: python -m amatra.cli smoke --mock --json
+      - name: Dependency consistency
+        run: python -m amatra.tools.check_dependencies
+      - name: Tests
+        run: python -m pytest

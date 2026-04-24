@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Callable
 
 from ..base import BaseTranslator
+from ..errors import TranslatorBoundaryError
 from ..types import TranslationRequest, TranslationResult
 
 
@@ -48,8 +49,16 @@ class ResearchTranslatorAdapter(BaseTranslator):
         out = self._impl.predict(list(request.source_texts))  # type: ignore[attr-defined]
         if isinstance(out, str):
             out = [out]
+        out = list(out)
+        expected = len(request.source_texts)
+        actual = len(out)
+        if actual != expected:
+            raise TranslatorBoundaryError(
+                "translator output length mismatch for "
+                f"{self.model_id!r}: request_size={expected}, output_size={actual}"
+            )
         return TranslationResult(
-            translations=list(out),
+            translations=out,
             source_texts=list(request.source_texts),
             model_id=self.model_id,
         )

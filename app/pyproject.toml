@@ -30,4 +30,4 @@ dependencies = [
 packages = ["src/amatra_app"]
 
 [project.scripts]
-amatra = "amatra_app.main:main"
+amatra-gui = "amatra_app.main:main"

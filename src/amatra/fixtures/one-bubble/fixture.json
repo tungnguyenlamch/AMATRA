@@ -1,0 +1,10 @@
+{
+  "image": "page.pgm",
+  "bubbles": [
+    {
+      "bbox": [2, 2, 12, 8],
+      "ocr_text": "こんにちは",
+      "translation": "Hello"
+    }
+  ]
+}

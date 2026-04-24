@@ -17,6 +17,28 @@ Format:
 
 ---
 
+## 2026-04-24 — Repo-root CLI, fixtures, and `uv` workflow
+
+- Added repo-root packaging in [pyproject.toml](pyproject.toml) with canonical
+  `uv` install surface, extras (`app`, `dev`, `research`, `eval`, `google`),
+  and split entrypoints: headless [`amatra`](src/amatra/cli.py) plus GUI
+  `amatra-gui`.
+- Added deterministic headless runtime under
+  [src/amatra/runtime/](src/amatra/runtime) with mock smoke/process paths,
+  bundled fixtures, run artifacts under `output/runs/`, and fixture evaluation.
+- Added repo-root tests in [tests/](tests), a dependency consistency checker,
+  CI workflows under [.github/workflows/](.github/workflows), and a small
+  [Makefile](Makefile) task surface.
+- Tightened the translation boundary with
+  [`TranslatorBoundaryError`](src/amatra/translation/errors.py), output-length
+  validation in the research adapter, combined `type:variant` config parsing,
+  optional Google credential guardrails, and preset loading for LLM adapters.
+- Removed the stale Nix files from `app/` and rewrote the environment scripts
+  to operate from the current repo root instead of the old `group-project-b3`
+  layout. Updated [README.md](README.md),
+  [docs/feature-map.md](docs/feature-map.md), and
+  [docs/agent-workflows.md](docs/agent-workflows.md).
+
 ## 2026-04-24 — Absorb app submodule; rename to `amatra_app`
 
 - Removed the `external/Lucile` git submodule and moved its working tree

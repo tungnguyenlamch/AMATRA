@@ -1,69 +1,48 @@
 #!/bin/bash
+set -euo pipefail
 
-CURRENT_DIR=$(pwd)
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DATA_DIR="$ROOT_DIR/data"
 
-if [[ ! "$CURRENT_DIR" == *"group-project-b3"* ]]; then
-    echo "Error: Not in group-project-b3 directory"
-    exit 1
-fi
+cd "$ROOT_DIR"
+export HF_TOKEN="$(python environments/get_hf_token.py)"
 
-export HF_TOKEN=$(python environments/get_hf_token.py)
+mkdir -p "$DATA_DIR"
 
-if [ ! -d ./data/MangaSegmentation ]; then
-    hf download MS92/MangaSegmentation --repo-type=dataset --local-dir ./data/MangaSegmentation --token $HF_TOKEN
-    rm -rf ./data/MangaSegmentation/.cache
+if [[ ! -d "$DATA_DIR/MangaSegmentation" ]]; then
+    hf download MS92/MangaSegmentation --repo-type=dataset --local-dir "$DATA_DIR/MangaSegmentation" --token "$HF_TOKEN"
+    rm -rf "$DATA_DIR/MangaSegmentation/.cache"
 else
-    echo "./data/MangaSegmentation already exists, skipping download."
+    echo "$DATA_DIR/MangaSegmentation already exists, skipping download."
 fi
 
-if [[ ! -d ./data/MangaSegmentation/jsons_processed ]]; then
-    gdown --fuzzy "https://drive.google.com/file/d/1IvwKFzQgSkDpJQT69wpHlChkhBtfm_p3/view?usp=sharing" -O ./data/MangaSegmentation/jsons_processed.zip
-    unzip -o ./data/MangaSegmentation/jsons_processed.zip -d ./data/MangaSegmentation/
-    rm ./data/MangaSegmentation/jsons_processed.zip
+if [[ ! -d "$DATA_DIR/MangaSegmentation/jsons_processed" ]]; then
+    gdown --fuzzy "https://drive.google.com/file/d/1IvwKFzQgSkDpJQT69wpHlChkhBtfm_p3/view?usp=sharing" -O "$DATA_DIR/MangaSegmentation/jsons_processed.zip"
+    unzip -o "$DATA_DIR/MangaSegmentation/jsons_processed.zip" -d "$DATA_DIR/MangaSegmentation/"
+    rm "$DATA_DIR/MangaSegmentation/jsons_processed.zip"
 else
-    echo "./data/MangaSegmentation/jsons_processed already exists, skipping download."
+    echo "$DATA_DIR/MangaSegmentation/jsons_processed already exists, skipping download."
 fi
 
-if [[ ! -d ./data/jesc-2019 ]]; then
-    mkdir -p ./data/jesc-2019
-    gdown --fuzzy "https://drive.google.com/file/d/1_N--o0k14rjb5aQKZr12Isf2YL9DNr2f/view?usp=sharing" -O ./data/jesc-2019/dataset.csv
+if [[ ! -d "$DATA_DIR/jesc-2019" ]]; then
+    mkdir -p "$DATA_DIR/jesc-2019"
+    gdown --fuzzy "https://drive.google.com/file/d/1_N--o0k14rjb5aQKZr12Isf2YL9DNr2f/view?usp=sharing" -O "$DATA_DIR/jesc-2019/dataset.csv"
 else
-    echo "./data/jesc-2019 already exists, skipping download."
+    echo "$DATA_DIR/jesc-2019 already exists, skipping download."
 fi
 
-
-
-if [ ! -d ./data/Manga109_released_2023_12_07 ]; then
-    hf download hal-utokyo/Manga109 --repo-type dataset --include Manga109_released_2023_12_07.zip --local-dir ./data --token $HF_TOKEN
-    unzip ./data/Manga109_released_2023_12_07.zip -d ./data
-    rm ./data/Manga109_released_2023_12_07.zip
-    rm -rf ./data/.cache
-    rm -rf ./data/__MACOSX
+if [[ ! -d "$DATA_DIR/Manga109_released_2023_12_07" ]]; then
+    hf download hal-utokyo/Manga109 --repo-type dataset --include Manga109_released_2023_12_07.zip --local-dir "$DATA_DIR" --token "$HF_TOKEN"
+    unzip "$DATA_DIR/Manga109_released_2023_12_07.zip" -d "$DATA_DIR"
+    rm "$DATA_DIR/Manga109_released_2023_12_07.zip"
+    rm -rf "$DATA_DIR/.cache" "$DATA_DIR/__MACOSX"
 else
-    echo "./data/Manga109_released_2023_12_07 already exists, skipping download."
+    echo "$DATA_DIR/Manga109_released_2023_12_07 already exists, skipping download."
 fi
 
-if [ ! -d ./data/open-mantra-dataset ]; then
-    git clone https://github.com/mantra-inc/open-mantra-dataset.git ./data/open-mantra-dataset
-    rm -rf ./data/open-mantra-dataset/.git/
+if [[ ! -d "$DATA_DIR/open-mantra-dataset" ]]; then
+    git clone https://github.com/mantra-inc/open-mantra-dataset.git "$DATA_DIR/open-mantra-dataset"
+    rm -rf "$DATA_DIR/open-mantra-dataset/.git/"
 else
-    echo "./data/open-mantra-dataset already exists, skipping download."
+    echo "$DATA_DIR/open-mantra-dataset already exists, skipping download."
 fi
-
-# if [ ! -d ./data/Manga109s_released_2023_12_07 ]; then
-#     hf download hal-utokyo/Manga109-s --repo-type dataset --include Manga109s_released_2023_12_07.zip --local-dir ./data --token $HF_TOKEN
-#     unzip ./data/Manga109s_released_2023_12_07.zip -d ./data
-#     rm ./data/Manga109s_released_2023_12_07.zip
-#     rm -rf ./data/.cache
-#     rm -rf ./data/__MACOSX
-# else
-#     echo "./data/Manga109s_released_2023_12_07 already exists, skipping download."
-# fi
-
-# if [ ! -d ./data/Human_Annotate_300 ]; then
-#     gdown --fuzzy "https://drive.google.com/file/d/1nekCTGInk57Oe2cZvOjO7RRkUpS2mevw/view?usp=sharing" -O ./data/Human_Annotate_300.zip 
-#     unzip -o ./data/Human_Annotate_300.zip -d ./data/
-#     rm ./data/Human_Annotate_300.zip
-# else
-#     echo "./data/Human_Annotate_300 already exists, skipping download."
-# fi

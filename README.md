@@ -15,11 +15,12 @@ and is maintained independently. No upstream synchronisation is intended.
 ## Table of contents
 
 - [Repository layout](#repository-layout)
-- [Quickstart: run the app](#quickstart-run-the-app)
+- [Quickstart: headless CLI](#quickstart-headless-cli)
 - [Developer setup](#developer-setup)
   - [Clone](#clone)
-  - [Research / training environment (conda)](#research--training-environment-conda)
-  - [App environment (PySide6)](#app-environment-pyside6)
+  - [Canonical repo-root workflow (`uv`)](#canonical-repo-root-workflow-uv)
+  - [Research / training environment (`conda`)](#research--training-environment-conda)
+  - [Qt app environment (optional)](#qt-app-environment-optional)
 - [How the pieces fit together](#how-the-pieces-fit-together)
 - [Adding a new translation model](#adding-a-new-translation-model)
 - [Data](#data)
@@ -30,6 +31,8 @@ and is maintained independently. No upstream synchronisation is intended.
 
 ```
 AMATRA/
+├── pyproject.toml                # canonical repo-root package + extras
+├── Makefile                      # setup / test / smoke / fixture tasks
 ├── src/
 │   ├── pipeline/                 # research code; source of truth for models
 │   │   ├── BaseModel.py
@@ -44,10 +47,11 @@ AMATRA/
 │   ├── bubble-ocr/
 │   ├── bubble-translation/       # fine-tuning utilities
 │   └── utils/
-├── app/                          # Qt/Python app (amatra-app, `amatra` CLI)
+├── app/                          # Qt/Python app (`amatra-gui`)
 │   ├── pyproject.toml
 │   ├── LICENSE                   # MIT, upstream attribution
 │   └── src/amatra_app/
+├── tests/                        # repo-root unit + fixture tests
 ├── environments/                 # conda env, dataset bootstrap
 ├── data/                         # Manga109 + dialogue annotations (see data/DATA.md)
 ├── models/                       # local checkpoint cache (gitignored)
@@ -69,33 +73,37 @@ Research code must never import from `amatra` or the app; the app must only
 import from `amatra.*`. This keeps research iteration and UI work from
 breaking each other.
 
-## Quickstart: run the app
+## Quickstart: headless CLI
 
-Prereqs: Python 3.12, `pip`, a working torch install, and OpenCV's system
-deps (on Debian/Ubuntu: `sudo apt install libgl1 libglib2.0-0`).
+Prereqs: Python 3.12 and `uv`.
 
 ```bash
 git clone <your-fork-url> AMATRA
 cd AMATRA
 
-python3.12 -m venv .venv
-source .venv/bin/activate
-pip install -e app
+uv pip install --python 3.12 -e ".[dev]"
 
-amatra            # launches the Qt window
-# equivalent: python -m amatra_app.main
+python -m amatra.cli smoke --mock
+python -m amatra.cli process-fixture --fixture one-bubble
 ```
 
-On first launch the app downloads model weights from Hugging Face (YOLO
-segmentation, manga-ocr, the selected translator). A progress dialog shows
-status; the window becomes interactive once `"Ready"` appears in the status
-bar.
+The default fast loop is now headless and deterministic:
 
-> **How `amatra-app` finds `amatra`:** the app's entry point imports
-> `amatra_app._amatra_bootstrap`, which locates `<repo>/src/` and prepends it
-> to `sys.path` if the `amatra` package isn't already installed. That lets
-> the app consume the research code in-tree without the main repo needing
-> to be pip-installed.
+```bash
+make smoke
+make test
+python -m amatra.cli translate --model elan-mt:tiny --text こんにちは
+python -m amatra.cli process --input image.png --output-dir output/demo --mock --debug
+```
+
+Headless runs write structured artifacts under `output/runs/<run-id>/`.
+
+To launch the Qt app instead:
+
+```bash
+uv pip install --python 3.12 -e ".[app]"
+amatra-gui
+```
 
 ## Developer setup
 
@@ -107,7 +115,26 @@ git clone <your-fork-url> AMATRA
 
 (No submodules — `app/` is a regular subdirectory of this repo.)
 
-### Research / training environment (conda)
+### Canonical repo-root workflow (`uv`)
+
+Use this for routine agent work, CLI development, tests, and fixture checks.
+
+```bash
+uv pip install --python 3.12 -e ".[dev]"
+make smoke
+make test
+make process-fixture
+```
+
+Install optional extras as needed:
+
+```bash
+uv pip install --python 3.12 -e ".[app]"
+uv pip install --python 3.12 -e ".[research]"
+uv pip install --python 3.12 -e ".[google]"
+```
+
+### Research / training environment (`conda`)
 
 Used for notebooks under `src/pipeline/Evaluators/`, `src/bubble-*`, dataset
 work, and running the research classes directly.
@@ -136,29 +163,21 @@ chmod +x environments/set_up_dataset.sh
 The `Dockerfile`-based path from the ancestor research repo is deprecated
 and not maintained here.
 
-### App environment (PySide6)
+### Qt app environment (optional)
 
-The app in `app/` has its own `pyproject.toml`. Typically you don't need the
-conda env to run the app:
-
-```bash
-python3.12 -m venv .venv-app
-source .venv-app/bin/activate
-pip install -e app
-amatra
-```
-
-If you prefer a single environment, install both:
+Used when you need the desktop GUI or the app-specific wrappers.
 
 ```bash
-conda activate py11
-pip install -e app
+uv pip install --python 3.12 -e ".[app]"
+amatra-gui
 ```
+
+On first launch the app downloads model weights from Hugging Face.
 
 ## How the pieces fit together
 
 ```
-UI (amatra_app.main)
+Headless CLI (`amatra.cli`) or UI (`amatra_app.main`)
   │
   │  load_translator({"type": "elan-mt", "variant": "base"})
   ▼
@@ -183,7 +202,7 @@ pipeline.TranslationModels  ← src/pipeline/TranslationModels/*
 ### Sanity-check the boundary
 
 ```bash
-PYTHONPATH=src python -c "
+python -c "
 from amatra.translation import list_translators, load_translator
 print([s.type for s in list_translators()])
 t = load_translator({'type': 'elan-mt', 'variant': 'tiny'})
@@ -222,6 +241,10 @@ Short version (full walkthrough in [`docs/INTEGRATION.md`](docs/INTEGRATION.md))
 No UI edits required — the app's translation-model menu auto-populates from
 `list_translators()`.
 
+Prompt and translator presets now live in
+`src/amatra/config/translator_presets.v1.json`. The CLI can select them with
+`--preset <name>`.
+
 ## Data
 
 See `data/DATA.md` for dataset provenance, expected layout, and preprocessing
@@ -234,6 +257,9 @@ used by the evaluators in `src/pipeline/Evaluators/`.
   workflow (AGENTS.md → README.md → relevant code → tests → changes) and the
   working principles (Think Before Coding, Simplicity First, Surgical
   Changes, Goal-Driven Execution).
+- Prefer the repo-root `uv` workflow and the headless CLI (`amatra smoke`,
+  `amatra process`, `amatra process-fixture`) for validation. Use the Qt app
+  when the task specifically requires UI behavior.
 - Keep edits surgical — don't refactor unrelated code while implementing a
   request.
 - Research classes in `src/pipeline/` must not depend on `amatra.*` or the

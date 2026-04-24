@@ -1,0 +1,9 @@
+{
+  "bboxes": [],
+  "bubble_count": 0,
+  "fixture": "no-bubbles",
+  "input_image": "src/amatra/fixtures/no-bubbles/page.pgm",
+  "ocr_texts": [],
+  "output_image": "output/fixtures/no-bubbles/rendered.png",
+  "translations": []
+}

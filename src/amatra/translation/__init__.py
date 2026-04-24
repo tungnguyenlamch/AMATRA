@@ -5,6 +5,7 @@ The app and any other consumer should only import symbols from this module.
 from __future__ import annotations
 
 from .base import BaseTranslator
+from .errors import TranslatorBoundaryError
 from .factory import load_translator
 from .registry import (
     TranslatorSpec,
@@ -16,6 +17,7 @@ from .types import TranslationRequest, TranslationResult, TranslatorConfig
 
 __all__ = [
     "BaseTranslator",
+    "TranslatorBoundaryError",
     "TranslationRequest",
     "TranslationResult",
     "TranslatorConfig",

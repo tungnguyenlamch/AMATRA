@@ -20,15 +20,19 @@ _DEFAULT_MODEL = "Qwen/Qwen2.5-0.5B"
 )
 def _build(cfg: TranslatorConfig) -> BaseTranslator:
     model_name = str(cfg.extra.get("model_name", _DEFAULT_MODEL))
+    preset_values = dict(cfg.extra.get("preset_values", {}))
 
     def factory() -> object:
         from pipeline.TranslationModels.LLMTranslator import LLMTranslator
 
-        return LLMTranslator(
+        translator = LLMTranslator(
             model_name=model_name,
             device=cfg.device,
             verbose=cfg.verbose,
         )
+        if preset_values:
+            translator.configure(**preset_values)
+        return translator
 
     label = cfg.variant or model_name
     return ResearchTranslatorAdapter(
